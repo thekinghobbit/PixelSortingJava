@@ -8,14 +8,15 @@
  */
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.awt.Color;
 import java.util.Vector;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Blob;
+
 import javax.imageio.ImageIO;
 
 public class pixelSorter {
-	Color myBlack = new Color(0, 0, 0); 
+	int BLACK = -16777216;
 	public static void main(String args[])
 		throws IOException
 	{	
@@ -25,7 +26,7 @@ public class pixelSorter {
 		// l.imageToBnW(Filename, 25);
 	//   l.imgToColum(fileName, l, 70);
 	//   l.imgToRow(fileName, l, 70);
-	  l.imgToRowInterval(fileName, l, 50);
+	  l.imgToRowInterval(fileName, l, 100);
 
 	} // main() ends here
 	public void imgToRowInterval(String Filename, pixelSorter l, int threshhold){
@@ -57,27 +58,31 @@ public class pixelSorter {
 		}catch(IOException e){
 			System.out.println(e);
 		}
-
+		// System.out.println(imgBW.getRGB(50,235) + " black val");
 
 		// int[] imgRGB = new int[img.getWidth()];
 		Vector<Integer> imgRGB = new Vector<Integer>();
 		int rowIdx;
+		int changedPixels = 0;
+		int setPixels = 0;
 		for(int j = 0; j < img.getHeight(); j++){
 			// System.out.println(j + " for loop");
 			rowIdx = 0;
 			while(rowIdx < img.getWidth()){
 				// System.out.println(j + " while loop");
-				if(imgBW.getRGB(rowIdx,j) != 0xFF000000){//|| masktwo.getRGB(i,j) != 0xFF000000){
+				if(imgBW.getRGB(rowIdx,j) != BLACK){//|| masktwo.getRGB(i,j) != 0xFF000000){
 					imgRGB.add(img.getRGB(rowIdx,j));
+					changedPixels++;
 					// System.out.println(imgRGB.size() + " array");
-				}else if(imgBW.getRGB(rowIdx,j) == 0xFF000000){
+				}else if(imgBW.getRGB(rowIdx,j) == BLACK){
 					// System.out.println(rowIdx);
 					// sortINT(imgRGB);
 					imgRGB.sort(null);
 					for(int i = 0; i < imgRGB.size() ; i++){
-						img.setRGB(rowIdx, j, imgRGB.get(i));
+						// System.out.println("in forloop " + imgRGB.size() );
+						img.setRGB(rowIdx, j, 0xFF000000);
 					}
-					imgRGB.clear();
+					imgRGB.removeAllElements();
 
 				}		
 				// 	if(imgBW.getRGB(i,j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
@@ -100,6 +105,8 @@ public class pixelSorter {
 			// 	}
 			// }
 		}
+		System.out.println(changedPixels + " changed pixels");
+
 		// output image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_"+ Filename);
