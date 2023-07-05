@@ -8,10 +8,10 @@
  */
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.util.Collections;
 import java.util.Vector;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Blob;
 
 import javax.imageio.ImageIO;
 
@@ -24,11 +24,13 @@ public class pixelSorter {
 		// String filePath = "/home/nokken/templ/JavaLearning/PixelSorting/images/" + fileName;
 		pixelSorter l = new pixelSorter();
 		// l.imageToBnW(Filename, 25);
-	//   l.imgToColum(fileName, l, 70);
-	//   l.imgToRow(fileName, l, 70);
+		// l.imgToColum(fileName, l, 70);
+		// l.imgToRow(fileName, l, 70);
 	  l.imgToRowInterval(fileName, l, 100);
 
 	} // main() ends here
+
+	
 	public void imgToRowInterval(String Filename, pixelSorter l, int threshhold){
 		BufferedImage img = null, imgBW = null, masktwo = null;
 		File f = null, fBW = null, mask2 = null;
@@ -64,46 +66,29 @@ public class pixelSorter {
 		Vector<Integer> imgRGB = new Vector<Integer>();
 		int rowIdx;
 		int changedPixels = 0;
-		int setPixels = 0;
 		for(int j = 0; j < img.getHeight(); j++){
 			// System.out.println(j + " for loop");
 			rowIdx = 0;
-			while(rowIdx < img.getWidth()){
+			while(rowIdx < img.getWidth() - 1 ){
 				// System.out.println(j + " while loop");
 				if(imgBW.getRGB(rowIdx,j) != BLACK){//|| masktwo.getRGB(i,j) != 0xFF000000){
 					imgRGB.add(img.getRGB(rowIdx,j));
+					// img.setRGB(rowIdx, j, BLACK);
 					changedPixels++;
 					// System.out.println(imgRGB.size() + " array");
-				}else if(imgBW.getRGB(rowIdx,j) == BLACK){
+				}else if(imgBW.getRGB(rowIdx,j) == BLACK && imgBW.getRGB(rowIdx + 1, j) != BLACK){
 					// System.out.println(rowIdx);
 					// sortINT(imgRGB);
-					imgRGB.sort(null);
+					Collections.sort(imgRGB);
 					for(int i = 0; i < imgRGB.size() ; i++){
 						// System.out.println("in forloop " + imgRGB.size() );
-						img.setRGB(rowIdx, j, 0xFF000000);
+						img.setRGB(rowIdx - 1, j, imgRGB.indexOf(i));
 					}
-					imgRGB.removeAllElements();
+					imgRGB.clear();
 
 				}		
-				// 	if(imgBW.getRGB(i,j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
-				// 		imgRGB[i] = img.getRGB(i, j);
-				// 	}
-				// System.out.println("row idx = " + rowIdx + " height " + j);
 				rowIdx++;
 			}
-
-
-			// for(int i = 0; i < img.getWidth(); i++){
-			// 	if(imgBW.getRGB(i,j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
-			// 		imgRGB[i] = img.getRGB(i, j);
-			// 	}
-			// }
-			// sortINT(imgRGB);
-			// for(int i = 0; i < img.getWidth(); i ++){
-			// 	if(imgBW.getRGB(i, j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
-			// 		img.setRGB(i, j, imgRGB[i]);
-			// 	}
-			// }
 		}
 		System.out.println(changedPixels + " changed pixels");
 
