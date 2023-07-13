@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Collections;
 import java.util.Vector;
+import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
 
@@ -20,13 +21,13 @@ public class pixelSorter {
 	public static void main(String args[])
 		throws IOException
 	{	
-		String fileName = "flower.jpg";
+		String fileName = "coolpic.jpg";
 		// String filePath = "/home/nokken/templ/JavaLearning/PixelSorting/images/" + fileName;
 		pixelSorter l = new pixelSorter();
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
-	  l.imgToRowInterval(fileName, l, 100);
+	  l.imgToRowInterval(fileName, l, 40);
 
 	} // main() ends here
 
@@ -62,32 +63,43 @@ public class pixelSorter {
 		}
 		// System.out.println(imgBW.getRGB(50,235) + " black val");
 
-		// int[] imgRGB = new int[img.getWidth()];
-		Vector<Integer> imgRGB = new Vector<Integer>();
+		int[] imgRGB = new int[img.getWidth()];
+		// Vector<Integer> imgRGB = new Vector<Integer>();
 		int rowIdx;
 		int changedPixels = 0;
-		for(int j = 0; j < img.getHeight(); j++){
+
+		boolean startPosSet = false, endPosSet = false;
+		int startPos = 0, endPos;
+		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
+		for(int j = 0; j < imgHeight; j++){
 			// System.out.println(j + " for loop");
 			rowIdx = 0;
-			while(rowIdx < img.getWidth() - 1 ){
-				// System.out.println(j + " while loop");
-				if(imgBW.getRGB(rowIdx,j) != BLACK){//|| masktwo.getRGB(i,j) != 0xFF000000){
-					imgRGB.add(img.getRGB(rowIdx,j));
-					// img.setRGB(rowIdx, j, BLACK);
-					changedPixels++;
-					// System.out.println(imgRGB.size() + " array");
-				}else if(imgBW.getRGB(rowIdx,j) == BLACK && imgBW.getRGB(rowIdx + 1, j) != BLACK){
-					// System.out.println(rowIdx);
-					// sortINT(imgRGB);
-					Collections.sort(imgRGB);
-					for(int i = 0; i < imgRGB.size() ; i++){
-						// System.out.println("in forloop " + imgRGB.size() );
-						img.setRGB(rowIdx - 1, j, imgRGB.indexOf(i));
-					}
-					imgRGB.clear();
+			while(rowIdx < imgWidth ){
+				imgRGB[rowIdx] = (img.getRGB(rowIdx, j));
+				if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){//|| masktwo.getRGB(i,j) != 0xFF000000){
+					startPos = rowIdx;
+					startPosSet = true;
+				}
+				else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true ){
+					endPos = rowIdx;
+					// System.out.println("start pos True startPos = " + startPos +" endpos =" +endPos);
 
+					Arrays.sort(imgRGB, startPos, endPos);
+					startPosSet = false;
+
+				}
+				else if(rowIdx == imgWidth -1){
+					endPos = rowIdx;
+					System.out.println("start pos True startPos = " + startPos +" endpos =" +endPos + " j= " + j);
+					System.out.println("rowIdx= " + rowIdx + " imgWidth= " + imgWidth);
+
+					Arrays.sort(imgRGB, startPos, endPos);
+					startPosSet = false;
 				}		
 				rowIdx++;
+			}
+			for(int i = 0; i < img.getWidth(); i++){
+				img.setRGB(i, j, imgRGB[i]);
 			}
 		}
 		System.out.println(changedPixels + " changed pixels");
