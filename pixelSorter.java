@@ -8,8 +8,6 @@
  */
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
-import java.util.Collections;
-import java.util.Vector;
 import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
@@ -18,23 +16,35 @@ import javax.imageio.ImageIO;
 
 public class pixelSorter {
 	int BLACK = -16777216;
+	int threshhold;
+	String filename;
+	BufferedImage imgBnW = imageToBnW(filename, threshhold);
+
+	public pixelSorter(String File){
+		filename = File;
+	}
 	public static void main(String args[])
 		throws IOException
 	{	
-		String fileName = "coolpic.jpg";
-		// String filePath = "/home/nokken/templ/JavaLearning/PixelSorting/images/" + fileName;
-		pixelSorter l = new pixelSorter();
+		String fileName = "image.jpg";
+		pixelSorter l = new pixelSorter("image.jpg");
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
-	  l.imgToRowInterval(fileName, l, 40);
+	  l.imgToRowInterval(fileName, l, 50);
 
 	} // main() ends here
 
-	
+	/*
+	 * Input: Filename, pixelSorter object, int threshhold for BnW images
+	 * Output: A distorted image that has its pixels sorted in seperate intervals between black and white pixels
+	 * Description:
+	 * This function opens the image you want to sort and creates a black and white mask of that image to use as a guide.
+	 * It then sorts the pixels as seperate sub arrays at a given start and end position.
+	 */
 	public void imgToRowInterval(String Filename, pixelSorter l, int threshhold){
-		BufferedImage img = null, imgBW = null, masktwo = null;
-		File f = null, fBW = null, mask2 = null;
+		BufferedImage img = null, imgBW = null;
+		File f = null, fBW = null;
 
 		l.imageToBnW(Filename, threshhold);
 
@@ -47,13 +57,6 @@ public class pixelSorter {
 		}catch(IOException e){
 			System.out.println(e);
 		}
-		// pattered mask
-		try{
-			mask2 = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/intervals.png");
-			masktwo = ImageIO.read(mask2);
-		}catch(IOException e){
-			System.out.println(e);
-		}
 		// Origenal image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
@@ -61,48 +64,42 @@ public class pixelSorter {
 		}catch(IOException e){
 			System.out.println(e);
 		}
-		// System.out.println(imgBW.getRGB(50,235) + " black val");
 
-		int[] imgRGB = new int[img.getWidth()];
-		// Vector<Integer> imgRGB = new Vector<Integer>();
-		int rowIdx;
-		int changedPixels = 0;
-
-		boolean startPosSet = false, endPosSet = false;
-		int startPos = 0, endPos;
 		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
+		int[] imgRGB = new int[imgWidth];
+		int startPos = 0, endPos;
+		int rowIdx;
+		boolean startPosSet = false;
+
+		
 		for(int j = 0; j < imgHeight; j++){
-			// System.out.println(j + " for loop");
 			rowIdx = 0;
 			while(rowIdx < imgWidth ){
 				imgRGB[rowIdx] = (img.getRGB(rowIdx, j));
-				if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){//|| masktwo.getRGB(i,j) != 0xFF000000){
+				if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){
 					startPos = rowIdx;
 					startPosSet = true;
 				}
-				else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true ){
-					endPos = rowIdx;
-					// System.out.println("start pos True startPos = " + startPos +" endpos =" +endPos);
+				else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
+					endPos = rowIdx - 1;
 
 					Arrays.sort(imgRGB, startPos, endPos);
 					startPosSet = false;
-
+					
 				}
+				// used for edge case when the end if the row is reached without setting an end position
 				else if(rowIdx == imgWidth -1){
 					endPos = rowIdx;
-					System.out.println("start pos True startPos = " + startPos +" endpos =" +endPos + " j= " + j);
-					System.out.println("rowIdx= " + rowIdx + " imgWidth= " + imgWidth);
-
 					Arrays.sort(imgRGB, startPos, endPos);
 					startPosSet = false;
 				}		
 				rowIdx++;
 			}
+			// set image to the sorted row
 			for(int i = 0; i < img.getWidth(); i++){
 				img.setRGB(i, j, imgRGB[i]);
 			}
 		}
-		System.out.println(changedPixels + " changed pixels");
 
 		// output image
 		try{
@@ -128,13 +125,7 @@ public class pixelSorter {
 		}catch(IOException e){
 			System.out.println(e);
 		}
-		// pattered mask
-		try{
-			mask2 = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/intervals.png");
-			masktwo = ImageIO.read(mask2);
-		}catch(IOException e){
-			System.out.println(e);
-		}
+
 		// Origenal image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
@@ -148,13 +139,13 @@ public class pixelSorter {
 
 		for(int j = 0; j < img.getHeight(); j++){
 			for(int i = 0; i < img.getWidth(); i++){
-				if(imgBW.getRGB(i,j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
+				if(imgBW.getRGB(i,j) != 0xFF000000 ){
 					imgRGB[i] = img.getRGB(i, j);
 				}
 			}
 			sortINT(imgRGB);
 			for(int i = 0; i < img.getWidth(); i ++){
-				if(imgBW.getRGB(i, j) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
+				if(imgBW.getRGB(i, j) != 0xFF000000 ){
 					img.setRGB(i, j, imgRGB[i]);
 				}
 			}
@@ -291,19 +282,20 @@ public static BufferedImage thresholdImage(BufferedImage image, int threshold) {
     }
     return result;
 }
-	public void imageToBnW(String Filename, int threshold){
+	public BufferedImage imageToBnW(String Filename, int threshold){
 		try {
 
             File input = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
             BufferedImage image = ImageIO.read(input);
 			System.out.println(input.getAbsolutePath());
             File output = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
-			
             ImageIO.write(thresholdImage(image, threshold), "png", output);
+			return image;
 
         }  catch (IOException e) {
             e.printStackTrace();
         }
+		
 	}
 	public void bubbleSortImg(BufferedImage imgBW, BufferedImage img, int height, int width){
 		for(int i = 0; i < height; i++){
