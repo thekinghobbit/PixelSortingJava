@@ -16,25 +16,80 @@ import javax.imageio.ImageIO;
 
 public class pixelSorter {
 	int BLACK = -16777216;
-	int threshhold;
 	String filename;
-	BufferedImage imgBnW = imageToBnW(filename, threshhold);
-
-	public pixelSorter(String File){
+	File f, fBnW;
+	BufferedImage img = null;
+	BufferedImage imgBnW = null;
+	
+	public pixelSorter(String File, int threshhold){
 		filename = File;
+		try{
+		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + filename);
+		img = ImageIO.read(f);
+		}catch(IOException e){
+			System.out.println(e);
+		}
+		imgBnW = thresholdImage(img, threshhold);
 	}
-	public static void main(String args[])
-		throws IOException
+	public static void main(String args[]) throws IOException
 	{	
-		String fileName = "image.jpg";
-		pixelSorter l = new pixelSorter("image.jpg");
+		// String fileName = "image.jpg";
+		pixelSorter l = new pixelSorter("coolpic.jpg", 100);
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
-	  l.imgToRowInterval(fileName, l, 50);
+	  	// l.imgToRowInterval("image.jpg", l, 50);
+		l.imgToRowIntervalTest(l);
 
 	} // main() ends here
+	public void imgToRowIntervalTest(pixelSorter l){
+		BufferedImage img = l.img, imgBW = l.imgBnW;
 
+		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
+		int[] imgRGB = new int[imgWidth];
+		int startPos = 0, endPos;
+		int rowIdx;
+		boolean startPosSet = false;
+
+		
+		for(int j = 0; j < imgHeight; j++){
+			rowIdx = 0;
+			while(rowIdx < imgWidth ){
+				imgRGB[rowIdx] = (img.getRGB(rowIdx, j));
+				if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){
+					startPos = rowIdx;
+					startPosSet = true;
+				}
+				else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
+					endPos = rowIdx - 1;
+
+					Arrays.sort(imgRGB, startPos, endPos);
+					startPosSet = false;
+					
+				}
+				// used for edge case when the end if the row is reached without setting an end position
+				else if(rowIdx == imgWidth -1){
+					endPos = rowIdx;
+					Arrays.sort(imgRGB, startPos, endPos);
+					startPosSet = false;
+				}		
+				rowIdx++;
+			}
+			// set image to the sorted row
+			for(int i = 0; i < img.getWidth(); i++){
+				img.setRGB(i, j, imgRGB[i]);
+			}
+		}
+
+		// output image
+		try{
+			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_TESTOBJ_"+ l.filename);
+			ImageIO.write(img, "jpg", f);
+		  }catch(IOException e){
+			System.out.println(e);
+		  }
+
+	}
 	/*
 	 * Input: Filename, pixelSorter object, int threshhold for BnW images
 	 * Output: A distorted image that has its pixels sorted in seperate intervals between black and white pixels
@@ -214,7 +269,6 @@ public class pixelSorter {
 		  }
 
 	}
-	
 	public void sortINT(int arr[])
     {
         int n = arr.length;
@@ -295,6 +349,7 @@ public static BufferedImage thresholdImage(BufferedImage image, int threshold) {
         }  catch (IOException e) {
             e.printStackTrace();
         }
+		return null;
 		
 	}
 	public void bubbleSortImg(BufferedImage imgBW, BufferedImage img, int height, int width){
