@@ -6,6 +6,9 @@
  * to a new file. 
  * 
  */
+
+
+
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
@@ -34,7 +37,7 @@ public class pixelSorter {
 	public static void main(String args[]) throws IOException
 	{	
 		// String fileName = "image.jpg";
-		pixelSorter l = new pixelSorter("coolpic.jpg", 100);
+		pixelSorter l = new pixelSorter("lady.jpg", 110);
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
@@ -90,35 +93,8 @@ public class pixelSorter {
 		  }
 
 	}
-	/*
-	 * Input: Filename, pixelSorter object, int threshhold for BnW images
-	 * Output: A distorted image that has its pixels sorted in seperate intervals between black and white pixels
-	 * Description:
-	 * This function opens the image you want to sort and creates a black and white mask of that image to use as a guide.
-	 * It then sorts the pixels as seperate sub arrays at a given start and end position.
-	 */
-	public void imgToRowInterval(String Filename, pixelSorter l, int threshhold){
-		BufferedImage img = null, imgBW = null;
-		File f = null, fBW = null;
-
-		l.imageToBnW(Filename, threshhold);
-
-		//Open files
-
-		// BW mask
-		try{
-			fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
-			imgBW = ImageIO.read(fBW);
-		}catch(IOException e){
-			System.out.println(e);
-		}
-		// Origenal image
-		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
-			img = ImageIO.read(f);
-		}catch(IOException e){
-			System.out.println(e);
-		}
+	public void imgToRowIntervalCol(pixelSorter l){
+		BufferedImage img = l.img, imgBW = l.imgBnW;
 
 		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
 		int[] imgRGB = new int[imgWidth];
@@ -127,15 +103,15 @@ public class pixelSorter {
 		boolean startPosSet = false;
 
 		
-		for(int j = 0; j < imgHeight; j++){
+		for(int j = 0; j < imgWidth; j++){
 			rowIdx = 0;
-			while(rowIdx < imgWidth ){
-				imgRGB[rowIdx] = (img.getRGB(rowIdx, j));
-				if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){
+			while(rowIdx < imgHeight ){
+				imgRGB[rowIdx] = (img.getRGB(j, rowIdx));
+				if(imgBW.getRGB(j,rowIdx) != BLACK && startPosSet == false ){
 					startPos = rowIdx;
 					startPosSet = true;
 				}
-				else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
+				else if(imgBW.getRGB(j,rowIdx) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
 					endPos = rowIdx - 1;
 
 					Arrays.sort(imgRGB, startPos, endPos);
@@ -158,184 +134,259 @@ public class pixelSorter {
 
 		// output image
 		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_"+ Filename);
+			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Interval_COL_"+ l.filename);
 			ImageIO.write(img, "jpg", f);
 		  }catch(IOException e){
 			System.out.println(e);
 		  }
 
 	}
-	public void imgToRow(String Filename, pixelSorter l, int threshhold){
-		BufferedImage img = null, imgBW = null, masktwo = null;
-		File f = null, fBW = null, mask2 = null;
+	/*
+	 * Input: Filename, pixelSorter object, int threshhold for BnW images
+	 * Output: A distorted image that has its pixels sorted in seperate intervals between black and white pixels
+	 * Description:
+	 * This function opens the image you want to sort and creates a black and white mask of that image to use as a guide.
+	 * It then sorts the pixels as seperate sub arrays at a given start and end position.
+	 */
+	// public void imgToRowInterval(String Filename, pixelSorter l, int threshhold){
+	// 	BufferedImage img = null, imgBW = null;
+	// 	File f = null, fBW = null;
 
-		l.imageToBnW(Filename, threshhold);
+	// 	l.imageToBnW(Filename, threshhold);
 
-		//Open files
+	// 	//Open files
 
-		// BW mask
-		try{
-			fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
-			imgBW = ImageIO.read(fBW);
-		}catch(IOException e){
-			System.out.println(e);
-		}
+	// 	// BW mask
+	// 	try{
+	// 		fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
+	// 		imgBW = ImageIO.read(fBW);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
+	// 	// Origenal image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
+	// 		img = ImageIO.read(f);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
 
-		// Origenal image
-		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
-			img = ImageIO.read(f);
-		}catch(IOException e){
-			System.out.println(e);
-		}
+	// 	int imgHeight = img.getHeight(), imgWidth = img.getWidth();
+	// 	int[] imgRGB = new int[imgWidth];
+	// 	int startPos = 0, endPos;
+	// 	int rowIdx;
+	// 	boolean startPosSet = false;
+
+		
+	// 	for(int j = 0; j < imgHeight; j++){
+	// 		rowIdx = 0;
+	// 		while(rowIdx < imgWidth ){
+	// 			imgRGB[rowIdx] = (img.getRGB(rowIdx, j));
+	// 			if(imgBW.getRGB(rowIdx,j) != BLACK && startPosSet == false ){
+	// 				startPos = rowIdx;
+	// 				startPosSet = true;
+	// 			}
+	// 			else if(imgBW.getRGB(rowIdx,j) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
+	// 				endPos = rowIdx - 1;
+
+	// 				Arrays.sort(imgRGB, startPos, endPos);
+	// 				startPosSet = false;
+					
+	// 			}
+	// 			// used for edge case when the end if the row is reached without setting an end position
+	// 			else if(rowIdx == imgWidth -1){
+	// 				endPos = rowIdx;
+	// 				Arrays.sort(imgRGB, startPos, endPos);
+	// 				startPosSet = false;
+	// 			}		
+	// 			rowIdx++;
+	// 		}
+	// 		// set image to the sorted row
+	// 		for(int i = 0; i < img.getWidth(); i++){
+	// 			img.setRGB(i, j, imgRGB[i]);
+	// 		}
+	// 	}
+
+	// 	// output image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_"+ Filename);
+	// 		ImageIO.write(img, "jpg", f);
+	// 	  }catch(IOException e){
+	// 		System.out.println(e);
+	// 	  }
+
+	// // }
+	// public void imgToRow(String Filename, pixelSorter l, int threshhold){
+	// 	BufferedImage img = null, imgBW = null, masktwo = null;
+	// 	File f = null, fBW = null, mask2 = null;
+
+	// 	l.imageToBnW(Filename, threshhold);
+
+	// 	//Open files
+
+	// 	// BW mask
+	// 	try{
+	// 		fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
+	// 		imgBW = ImageIO.read(fBW);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
+
+	// 	// Origenal image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
+	// 		img = ImageIO.read(f);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
 
 
-		int[] imgRGB = new int[img.getWidth()];
+	// 	int[] imgRGB = new int[img.getWidth()];
 
-		for(int j = 0; j < img.getHeight(); j++){
-			for(int i = 0; i < img.getWidth(); i++){
-				if(imgBW.getRGB(i,j) != 0xFF000000 ){
-					imgRGB[i] = img.getRGB(i, j);
-				}
-			}
-			sortINT(imgRGB);
-			for(int i = 0; i < img.getWidth(); i ++){
-				if(imgBW.getRGB(i, j) != 0xFF000000 ){
-					img.setRGB(i, j, imgRGB[i]);
-				}
-			}
-		}
-		// output image
-		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_"+ Filename);
-			ImageIO.write(img, "jpg", f);
-		  }catch(IOException e){
-			System.out.println(e);
-		  }
+	// 	for(int j = 0; j < img.getHeight(); j++){
+	// 		for(int i = 0; i < img.getWidth(); i++){
+	// 			if(imgBW.getRGB(i,j) != 0xFF000000 ){
+	// 				imgRGB[i] = img.getRGB(i, j);
+	// 			}
+	// 		}
+	// 		sortINT(imgRGB);
+	// 		for(int i = 0; i < img.getWidth(); i ++){
+	// 			if(imgBW.getRGB(i, j) != 0xFF000000 ){
+	// 				img.setRGB(i, j, imgRGB[i]);
+	// 			}
+	// 		}
+	// 	}
+	// 	// output image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_"+ Filename);
+	// 		ImageIO.write(img, "jpg", f);
+	// 	  }catch(IOException e){
+	// 		System.out.println(e);
+	// 	  }
 
-	}
-	public void imgToColum(String Filename, pixelSorter l, int threshhold){
-		BufferedImage img = null, imgBW = null, masktwo = null;
-		File f = null, fBW = null, mask2 = null;
+	// }
+	// public void imgToColum(String Filename, pixelSorter l, int threshhold){
+	// 	BufferedImage img = null, imgBW = null, masktwo = null;
+	// 	File f = null, fBW = null, mask2 = null;
 
-		l.imageToBnW(Filename, threshhold);
+	// 	l.imageToBnW(Filename, threshhold);
 
-		//Open files
+	// 	//Open files
 
-		// BW mask
-		try{
-			fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
-			imgBW = ImageIO.read(fBW);
-		}catch(IOException e){
-			System.out.println(e);
-		}
-		// pattered mask
-		try{
-			mask2 = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/intervals.png");
-			masktwo = ImageIO.read(mask2);
-		}catch(IOException e){
-			System.out.println(e);
-		}
-		// Origenal image
-		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
-			img = ImageIO.read(f);
-		}catch(IOException e){
-			System.out.println(e);
-		}
+	// 	// BW mask
+	// 	try{
+	// 		fBW = new File("/home/nokken/templ/JavaLearning/PixelSorting/BW_images/BW_"+ Filename);
+	// 		imgBW = ImageIO.read(fBW);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
+	// 	// pattered mask
+	// 	try{
+	// 		mask2 = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/intervals.png");
+	// 		masktwo = ImageIO.read(mask2);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
+	// 	// Origenal image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/images/" + Filename);
+	// 		img = ImageIO.read(f);
+	// 	}catch(IOException e){
+	// 		System.out.println(e);
+	// 	}
 
 
-		int[] imgRGB = new int[img.getHeight()];
-		System.out.println(imgRGB.length);
-		for(int j = 0; j < img.getWidth(); j++){
-			for(int i = 0; i < img.getHeight(); i++){
-				if(imgBW.getRGB(j,i) != 0xFF000000){// || masktwo.getRGB(i,j) != 0xFF000000){
-					imgRGB[i] = img.getRGB(j, i);
-				}
-			}
-			sortINT(imgRGB);
-			for(int i = 0; i < img.getHeight(); i ++){
-				if(imgBW.getRGB(j, i) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
-					img.setRGB(j, i, imgRGB[i]);
-				}
-			}
-		}
-		// output image
-		try{
-			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Col_"+ Filename);
-			ImageIO.write(img, "jpg", f);
-		  }catch(IOException e){
-			System.out.println(e);
-		  }
+	// 	int[] imgRGB = new int[img.getHeight()];
+	// 	System.out.println(imgRGB.length);
+	// 	for(int j = 0; j < img.getWidth(); j++){
+	// 		for(int i = 0; i < img.getHeight(); i++){
+	// 			if(imgBW.getRGB(j,i) != 0xFF000000){// || masktwo.getRGB(i,j) != 0xFF000000){
+	// 				imgRGB[i] = img.getRGB(j, i);
+	// 			}
+	// 		}
+	// 		sortINT(imgRGB);
+	// 		for(int i = 0; i < img.getHeight(); i ++){
+	// 			if(imgBW.getRGB(j, i) != 0xFF000000 ){//|| masktwo.getRGB(i,j) != 0xFF000000){
+	// 				img.setRGB(j, i, imgRGB[i]);
+	// 			}
+	// 		}
+	// 	}
+	// 	// output image
+	// 	try{
+	// 		f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Col_"+ Filename);
+	// 		ImageIO.write(img, "jpg", f);
+	// 	  }catch(IOException e){
+	// 		System.out.println(e);
+	// 	  }
 
-	}
-	public void sortINT(int arr[])
-    {
-        int n = arr.length;
+	// }
+	// public void sortINT(int arr[])
+    // {
+    //     int n = arr.length;
  
-        // Build heap (rearrange array)
-        for (int i = n / 2 - 1; i >= 0; i--)
-            heapifyINT(arr, n, i);
+    //     // Build heap (rearrange array)
+    //     for (int i = n / 2 - 1; i >= 0; i--)
+    //         heapifyINT(arr, n, i);
  
-        // One by one extract an element from heap
-        for (int i = n - 1; i >= 0; i--) {
-            // Move current root to end
-            int temp = arr[0];
-            arr[0] = arr[i];
-            arr[i] = temp;
+    //     // One by one extract an element from heap
+    //     for (int i = n - 1; i >= 0; i--) {
+    //         // Move current root to end
+    //         int temp = arr[0];
+    //         arr[0] = arr[i];
+    //         arr[i] = temp;
  
-            // call max heapify on the reduced heap
-            heapifyINT(arr, i, 0);
-        }
-    }
+    //         // call max heapify on the reduced heap
+    //         heapifyINT(arr, i, 0);
+    //     }
+    // }
  
-    // To heapify a subtree rooted with node i which is
-    // an index in arr[]. n is size of heap
-    void heapifyINT(int arr[], int n, int i)
-    {
-        int largest = i; // Initialize largest as root
-        int l = 2 * i + 1; // left = 2*i + 1
-        int r = 2 * i + 2; // right = 2*i + 2
+    // // To heapify a subtree rooted with node i which is
+    // // an index in arr[]. n is size of heap
+    // void heapifyINT(int arr[], int n, int i)
+    // {
+    //     int largest = i; // Initialize largest as root
+    //     int l = 2 * i + 1; // left = 2*i + 1
+    //     int r = 2 * i + 2; // right = 2*i + 2
  
-        // If left child is larger than root
-        if (l < n && arr[l] > arr[largest])
-            largest = l;
+    //     // If left child is larger than root
+    //     if (l < n && arr[l] > arr[largest])
+    //         largest = l;
  
-        // If right child is larger than largest so far
-        if (r < n && arr[r] > arr[largest])
-            largest = r;
+    //     // If right child is larger than largest so far
+    //     if (r < n && arr[r] > arr[largest])
+    //         largest = r;
  
-        // If largest is not root
-        if (largest != i) {
-            int swap = arr[i];
-            arr[i] = arr[largest];
-            arr[largest] = swap;
+    //     // If largest is not root
+    //     if (largest != i) {
+    //         int swap = arr[i];
+    //         arr[i] = arr[largest];
+    //         arr[largest] = swap;
  
-            // Recursively heapify the affected sub-tree
-            heapifyINT(arr, n, largest);
-        }
-    }
+    //         // Recursively heapify the affected sub-tree
+    //         heapifyINT(arr, n, largest);
+    //     }
+    // }
 	/**
  * Converts an image to a binary one based on given threshold
  * @param image the image to convert. Remains untouched.
  * @param threshold the threshold in [0,255]
  * @return a new BufferedImage instance of TYPE_BYTE_GRAY with only 0'S and 255's
  */
-public static BufferedImage thresholdImage(BufferedImage image, int threshold) {
-    BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-    result.getGraphics().drawImage(image, 0, 0, null);
-    WritableRaster raster = result.getRaster();
-    int[] pixels = new int[image.getWidth()];
-    for (int y = 0; y < image.getHeight(); y++) {
-        raster.getPixels(0, y, image.getWidth(), 1, pixels);
-        for (int i = 0; i < pixels.length; i++) {
-            if (pixels[i] < threshold) pixels[i] = 0;
-            else pixels[i] = 255;
-        }
-        raster.setPixels(0, y, image.getWidth(), 1, pixels);
-    }
-    return result;
-}
+	public static BufferedImage thresholdImage(BufferedImage image, int threshold) {
+		BufferedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		result.getGraphics().drawImage(image, 0, 0, null);
+		WritableRaster raster = result.getRaster();
+		int[] pixels = new int[image.getWidth()];
+		for (int y = 0; y < image.getHeight(); y++) {
+			raster.getPixels(0, y, image.getWidth(), 1, pixels);
+			for (int i = 0; i < pixels.length; i++) {
+				if (pixels[i] < threshold) pixels[i] = 0;
+				else pixels[i] = 255;
+			}
+			raster.setPixels(0, y, image.getWidth(), 1, pixels);
+		}
+		return result;
+	}
 	public BufferedImage imageToBnW(String Filename, int threshold){
 		try {
 
@@ -352,36 +403,8 @@ public static BufferedImage thresholdImage(BufferedImage image, int threshold) {
 		return null;
 		
 	}
-	public void bubbleSortImg(BufferedImage imgBW, BufferedImage img, int height, int width){
-		for(int i = 0; i < height; i++){
-			for(int k = 0; k < width - 1; k++){
-				for(int j = 0; j < width - 1; j++){
-					System.out.println(img.getRGB(j, i));
-					if(img.getRGB(j, i) < img.getRGB(j+1, i) && imgBW.getRGB(j,i) != 0xFF000000){
-						int tempPixel = img.getRGB(j, i);
-						img.setRGB(j,i,img.getRGB(j + 1, i));
-						img.setRGB(j+1, i, tempPixel);
-					}
-				}
-			}
-		}	
-	}
-	public void insertionSort(BufferedImage img, int width, int height){
-		int key, i, j;
-		for(int k = 0; k < height; k++){
-			for(i = 1; i < width; i++){
-				key = img.getRGB(i, k);
-				j = i-1;
-				while(j >=0 && img.getRGB(j,k) > key){
-					int tempPixel = img.getRGB(j, k);
-					img.setRGB(j+1, k, tempPixel);
-					j--;
-				}
-				img.setRGB(j+1, k, key);
-			}
-		}
 
-	}
+
 	/*
 	 * heapsort and heapify adapted from: 
 	 * https://www.geeksforgeeks.org/java-program-for-heap-sort/
