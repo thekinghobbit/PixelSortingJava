@@ -37,7 +37,7 @@ public class pixelSorter {
 	public static void main(String args[]) throws IOException
 	{	
 		// String fileName = "image.jpg";
-		pixelSorter l = new pixelSorter("lady.jpg", 110);
+		pixelSorter l = new pixelSorter("crttest2.png", 40);
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
@@ -87,7 +87,7 @@ public class pixelSorter {
 		// output image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_TESTOBJ_"+ l.filename);
-			ImageIO.write(img, "jpg", f);
+			ImageIO.write(img, "png", f);
 		  }catch(IOException e){
 			System.out.println(e);
 		  }
