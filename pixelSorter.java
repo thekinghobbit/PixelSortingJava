@@ -37,15 +37,15 @@ public class pixelSorter {
 	public static void main(String args[]) throws IOException
 	{	
 		// String fileName = "image.jpg";
-		pixelSorter l = new pixelSorter("crttest2.png", 40);
+		pixelSorter l = new pixelSorter("sitting.jpg", 50);
 		// l.imageToBnW(Filename, 25);
 		// l.imgToColum(fileName, l, 70);
 		// l.imgToRow(fileName, l, 70);
-	  	// l.imgToRowInterval("image.jpg", l, 50);
-		l.imgToRowIntervalTest(l);
+	  	l.imgToRowInterval(l, "jpg");
+		l.imgToRowIntervalCol(l, "jpg");
 
 	} // main() ends here
-	public void imgToRowIntervalTest(pixelSorter l){
+	public void imgToRowInterval(pixelSorter l, String filetype){
 		BufferedImage img = l.img, imgBW = l.imgBnW;
 
 		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
@@ -87,55 +87,55 @@ public class pixelSorter {
 		// output image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Row_Interval_TESTOBJ_"+ l.filename);
-			ImageIO.write(img, "png", f);
+			ImageIO.write(img, filetype, f);
 		  }catch(IOException e){
 			System.out.println(e);
 		  }
 
 	}
-	public void imgToRowIntervalCol(pixelSorter l){
+	public void imgToRowIntervalCol(pixelSorter l, String filetype){
 		BufferedImage img = l.img, imgBW = l.imgBnW;
 
 		int imgHeight = img.getHeight(), imgWidth = img.getWidth();
-		int[] imgRGB = new int[imgWidth];
+		int[] imgRGB = new int[imgHeight];
 		int startPos = 0, endPos;
-		int rowIdx;
+		int colIdx;
 		boolean startPosSet = false;
 
 		
 		for(int j = 0; j < imgWidth; j++){
-			rowIdx = 0;
-			while(rowIdx < imgHeight ){
-				imgRGB[rowIdx] = (img.getRGB(j, rowIdx));
-				if(imgBW.getRGB(j,rowIdx) != BLACK && startPosSet == false ){
-					startPos = rowIdx;
+			colIdx = 0;
+			while(colIdx < imgHeight ){
+				imgRGB[colIdx] = (img.getRGB(j, colIdx));				
+		  		if(imgBW.getRGB(j,colIdx) != BLACK && startPosSet == false ){
+					startPos = colIdx;
 					startPosSet = true;
 				}
-				else if(imgBW.getRGB(j,rowIdx) == BLACK && startPosSet == true && startPos != imgWidth - 1 ){
-					endPos = rowIdx - 1;
+				else if(imgBW.getRGB(j,colIdx) == BLACK && startPosSet == true && startPos != imgHeight - 1 ){
+					endPos = colIdx - 1;
 
 					Arrays.sort(imgRGB, startPos, endPos);
 					startPosSet = false;
 					
 				}
 				// used for edge case when the end if the row is reached without setting an end position
-				else if(rowIdx == imgWidth -1){
-					endPos = rowIdx;
+				else if(colIdx == imgHeight -1){
+					endPos = colIdx;
 					Arrays.sort(imgRGB, startPos, endPos);
 					startPosSet = false;
 				}		
-				rowIdx++;
+				colIdx++;
 			}
 			// set image to the sorted row
-			for(int i = 0; i < img.getWidth(); i++){
-				img.setRGB(i, j, imgRGB[i]);
+			for(int i = 0; i < img.getHeight(); i++){
+				img.setRGB(j, i, imgRGB[i]);
 			}
 		}
 
 		// output image
 		try{
 			f = new File("/home/nokken/templ/JavaLearning/PixelSorting/outputs/Output_Interval_COL_"+ l.filename);
-			ImageIO.write(img, "jpg", f);
+			ImageIO.write(img, filetype, f);
 		  }catch(IOException e){
 			System.out.println(e);
 		  }
